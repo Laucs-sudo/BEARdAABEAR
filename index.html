@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BearDaBear</title>
+    <meta property="og:title" content="BearDaBear">
+    <meta property="og:description" content="omg i made a website">
+    <meta property="og:image" content="./static/bear.png">
+    <meta property="og:theme-color" content="#ff6e00">
+    <link rel="icon" href="./static/bear.ico">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="./index.css">
+</head>
+<body>
+    <!-- Entry Overlay - Shown first, requires 5 clicks to enter the site -->
+    <div class="entry-overlay" id="entryOverlay">
+        <div class="entrything-container">
+            <img src="./static/entrything.png" alt="Click Me!" class="entrything" id="entrything">
+            <div class="click-counter" id="clickCounter">Clicks: 0/10</div>
+        </div>
+        <img src="./static/explosion.gif" alt="Explosion" class="explosion" id="explosion">
+    </div>
+    
+    <!-- Review Button and Modal -->
+    <div class="review-button" id="reviewButton">
+        <span>Review</span>
+    </div>
+    
+    <div class="review-modal" id="reviewModal">
+        <div class="review-modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Leave a Review!</h2>
+            <textarea id="reviewText" placeholder="What do you think of the website? (say something nice or I'll find you)"></textarea>
+            <button id="sendReviewButton">Send</button>
+            <div class="review-info">(I actually get notified for this)</div>
+            <div id="reviewStatus"></div>
+            
+            <!-- Response Checking Section -->
+            <div class="response-section" id="responseSection" style="margin-top: 20px; border-top: 1px dashed rgba(0,0,0,0.1); padding-top: 15px;">
+                <h3>Check for Responses</h3>
+                <p>BearDaBear might respond to your review! Click below to check if there's a response:</p>
+                <button id="checkResponseButton">Check for Response</button>
+                <div id="responseStatus" style="margin-top: 10px; font-weight: bold;"></div>
+                <div id="responseContainer" style="display: none; margin-top: 15px;"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main website content - initially hidden -->
+    <div id="mainContent" style="display: none;">
+        <!-- Music will be added via JavaScript only at the right moment -->
+        <div id="audio-container"></div>
+        
+        <div id="particles-js"></div>
+        <div class="sliding-background"></div>
+        <div class="overlay"></div>
+    
+    <div class="main-content">
+        <div class="title rainbow-border">
+            <span class="text electric" data-text="omg hi!">omg hi!</span>
+            <span class="emoji"></span>
+        </div>
+        
+        <div class="button-container">
+            <div class="big-button-wrapper">
+                <a class="button square-button big-button youtube-button" href="https://www.youtube.com/@beardabear" target="_blank">
+                    <img src="./static/youtube.svg" alt="YouTube">
+                </a>
+                <div class="button-label">YouTube</div>
+            </div>
+            <div class="big-button-wrapper">
+                <a class="button square-button big-button discord-button" href="https://discord.gg/BearDaBear" target="_blank">
+                    <img src="./static/discordIcon.png" alt="Discord">
+                </a>
+                <div class="button-label">Discord</div>
+            </div>
+        </div>
+
+        <p class="description-text">
+            Hey, I'm BearDaBear. I love making things and making people laugh. If you find me funny, or like what I do in general, join my discord server. Thats where I announce everything
+        </p>
+        
+        <div class="loves-list">
+            <h3>List of things I LOVE:</h3>
+            <ul>
+                <li>UNDERTALE & DELTARUNE</li>
+                <li>Lethal Company</li>
+                <li>R.E.P.O.</li>
+                <li>Murky Divers</li>
+                <li>Bendy (The entire series)</li>
+                <li>Half-Life (The entire series)</li>
+                <li>Beat Saber</li>
+                <li>Rec Room</li>
+                <li>Roblox</li>
+                <li>DAVIGO</li>
+                <li>Video Game SoundTracks</li>
+                <li>Every Toby Fox Track</li>
+                <li>PUNK TACTICS</li>
+                <li>SEVERANCE</li>
+                <li>INVINCIBLE</li>
+                <li>THE BOYS</li>
+                <li>Lucifer (Morningstar)</li>
+                <li>Clip Farming</li>
+                <li>Making Content</li>
+                <li>My Mom❤️</li>
+                <li>My Friends <a href="https://www.youtube.com/@TheFurikus" target="_blank" class="friend-button"><img src="./static/FurikusKidA.png" alt="FurikusKidA"></a></li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="fanart-container">
+        <div class="fanart-title">Fan Art Gallery</div>
+        <div id="fanart-slideshow"></div>
+        <div class="fanart-controls">
+            <button id="prev-fanart">←</button>
+            <button id="next-fanart">→</button>
+        </div>
+        <div class="artist-name"></div>
+    </div>
+    
+    <div class="bear-counter">
+        <div>BearDaBears Caught</div>
+        <div class="count">0</div>
+        <div class="description">catch the falling beardabears to add to the beardabear counter</div>
+    </div>
+    
+    <div class="horse"></div>
+    
+    <div class="volume-control" style="display: none;" id="volumeControl">
+        <div class="volume-icon" id="volumeIcon">🔊</div>
+        <div class="song-name">(DELTARUNE - Hip Shop)</div>
+        <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="50">
+    </div>
+    
+    <!-- Particles.js -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="./index.js" crossorigin="anonymous"></script>
+</body>
+</html>
