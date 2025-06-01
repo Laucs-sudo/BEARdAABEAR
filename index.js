@@ -1733,7 +1733,7 @@ const canUserReview = () => {
     
     const now = new Date().getTime();
     const timeSinceLastReview = now - parseInt(lastReviewTime);
-    const oneMinuteInMs = 60 * 1000;
+const oneMinuteInMs = 1; // 1 ms cooldown!
     
     return timeSinceLastReview > oneMinuteInMs;
 };
@@ -1747,7 +1747,7 @@ const setUserReviewTime = () => {
 const getRemainingCooldownTime = () => {
     const lastReviewTime = parseInt(localStorage.getItem('lastReviewTime'));
     const now = new Date().getTime();
-    const timeLeftMs = (lastReviewTime + 60 * 1000) - now;
+const oneMinuteInMs = 1; // 1 ms cooldown!
     return Math.ceil(timeLeftMs / 1000);
 };
 
