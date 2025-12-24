@@ -9,7 +9,656 @@ function getTimeSpentOnSite() { return (Date.now() - timeSiteLoaded); }
 particlesJS('particles-js', {
     "particles": {
         "number": {
-            "value": 40,
+            "value": 40,// BearDaBear Website JavaScript - Optimized Version
+
+// Initialize Particles.js
+particlesJS('particles-js', {
+    particles: {
+        number: { value: 40, density: { enable: true, value_area: 800 } },
+        color: { value: ["#ff6e00", "#ffb347", "#ff8930"] },
+        shape: { type: ["circle", "triangle"], stroke: { width: 0, color: "#000000" } },
+        opacity: { value: 0.5, random: true, anim: { enable: true, speed: 0.5, opacity_min: 0.1, sync: false } },
+        size: { value: 5, random: true, anim: { enable: true, speed: 2, size_min: 0.3, sync: false } },
+        line_linked: { enable: false },
+        move: { enable: true, speed: 1.5, direction: "none", random: true, straight: false, out_mode: "out", bounce: false, attract: { enable: true, rotateX: 600, rotateY: 1200 } }
+    },
+    interactivity: {
+        detect_on: "canvas",
+        events: { onhover: { enable: true, mode: "bubble" }, onclick: { enable: true, mode: "push" }, resize: true },
+        modes: { bubble: { distance: 150, size: 8, duration: 2, opacity: 0.8, speed: 3 }, push: { particles_nb: 2 } }
+    },
+    retina_detect: true
+});
+
+// Global variables
+let bgMusic, bearsCaught = 0, baseSpawnInterval = 3000, currentSpawnInterval = baseSpawnInterval, spawnTimer;
+let clickCount = 0, animating = false, dx = 0, dy = 0, vx = 0, vy = 0, rotation = 0, vrotation = 0, scale = 1, vscale = 0;
+const friction = 0.99, gravity = 0.04, springFactor = 0.015, rotationSpring = 0.015, scaleSpring = 0.008;
+const SPEED_PROGRESSION_FACTOR = 5;
+
+// Title rotation messages
+const messages = [
+    {text: "omg hi!!!!!", emoji: "ðŸ»"}, {text: "i paid 10$ to have this", emoji: "ðŸ’°"},
+    {text: "check out my youtube", emoji: "ðŸ“º"}, {text: "beardabear.com on top", emoji: "ðŸ†"},
+    {text: "hey...", emoji: "ðŸ‘‹"}, {text: "beardabear in the house!!!! (woo)", emoji: "ðŸ»"},
+    {text: "you can review the website in the top right corner", emoji: "ðŸ»"}, {text: "(distant clapping)", emoji: "ðŸ‘"}
+];
+
+// Wait for DOM to be ready before accessing elements
+document.addEventListener('DOMContentLoaded', function() {
+    const titleText = document.querySelector(".title .text");
+    const titleEmoji = document.querySelector(".title .emoji");
+    
+    if (titleText && titleEmoji) {
+        function updateTitle() {
+            const msg = messages[Math.floor(Math.random() * messages.length)];
+            titleText.textContent = msg.text;
+            titleText.setAttribute("data-text", msg.text);
+            titleEmoji.textContent = msg.emoji;
+            titleText.classList.add("animate__animated", "animate__rubberBand");
+            titleEmoji.classList.add("animate__animated", "animate__tada");
+            setTimeout(() => {
+                titleText.classList.remove("animate__animated", "animate__rubberBand");
+                titleEmoji.classList.remove("animate__animated", "animate__tada");
+            }, 1000);
+        }
+        
+        setInterval(updateTitle, 3000);
+        updateTitle();
+    }
+});
+
+// Bear counter functions
+function updateBearCounter() {
+    if (window.bearCounterDisabled) return;
+    document.querySelector('.bear-counter .count').textContent = bearsCaught;
+    
+    if (bearsCaught === 100 && !window.celebrationTriggered) {
+        window.celebrationTriggered = true;
+        triggerCelebration();
+    }
+    
+    if (bearsCaught === 300 && !window.thousandTriggered) {
+        window.thousandTriggered = true;
+        triggerThousandEvent();
+    }
+    
+    const newInterval = Math.max(10, Math.floor(3000 / (1 + bearsCaught * 0.8)));
+    if (newInterval !== currentSpawnInterval) {
+        currentSpawnInterval = newInterval;
+        clearInterval(spawnTimer);
+        const bearsPerSpawn = Math.max(1, Math.min(10, Math.floor(bearsCaught / 5)));
+        spawnTimer = setInterval(() => {
+            for (let i = 0; i < bearsPerSpawn; i++) createFallingBear();
+        }, newInterval);
+    }
+}
+
+function createFallingBear() {
+    if (document.getElementById('thousand-event-screen')) return;
+    
+    const bear = document.createElement('img');
+    bear.src = './static/bear.gif';
+    bear.className = 'falling-bear';
+    bear.style.left = Math.random() * (window.innerWidth - 50) + 'px';
+    bear.style.top = '-50px';
+    
+    let isHovered = false;
+    bear.addEventListener('mouseenter', () => {
+        if (!isHovered) {
+            isHovered = true;
+            const rect = bear.getBoundingClientRect();
+            createExplosionParticles(rect.left + rect.width / 2, rect.top + rect.height / 2);
+            bear.remove();
+            bearsCaught++;
+            updateBearCounter();
+        }
+    });
+    
+    document.body.appendChild(bear);
+    
+    const fallDuration = Math.random() * 3 + 4;
+    const rotateDirection = Math.random() > 0.5 ? 1 : -1;
+    const startRotation = Math.floor(Math.random() * 60) * rotateDirection;
+    const rotationAmount = 360 + Math.floor(Math.random() * 720) * rotateDirection;
+    const animationName = `fallFromSky_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+    
+    const keyframeStyle = document.createElement('style');
+    keyframeStyle.textContent = `@keyframes ${animationName} { 0% { transform: translateY(-100vh) rotate(${startRotation}deg); } 100% { transform: translateY(120vh) rotate(${startRotation + rotationAmount}deg); } }`;
+    document.head.appendChild(keyframeStyle);
+    
+    bear.style.animation = `${animationName} ${fallDuration}s linear`;
+    bear.addEventListener('animationend', () => { keyframeStyle.remove(); setTimeout(() => bear.remove(), 500); });
+    setTimeout(() => { if (document.body.contains(bear)) bear.remove(); }, 10000);
+}
+
+function createExplosionParticles(x, y) {
+    const explosion = document.createElement('img');
+    explosion.src = `./static/explosion.gif?t=${Date.now()}_${Math.random()}`;
+    explosion.className = 'bear-explosion';
+    explosion.style.cssText = `position: fixed; left: ${x - 50}px; top: ${y - 50}px; width: 100px; height: 100px; z-index: 5000; pointer-events: none;`;
+    
+    const explosionSound = new Audio('./static/explosion.ogg');
+    explosionSound.volume = 0.3;
+    explosionSound.play().catch(e => console.log('Sound play failed:', e));
+    
+    document.body.appendChild(explosion);
+    setTimeout(() => explosion.remove(), 800);
+}
+
+// Entry mechanism functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const entryOverlay = document.getElementById('entryOverlay');
+    const entrything = document.getElementById('entrything');
+    const clickCounter = document.getElementById('clickCounter');
+    const explosion = document.getElementById('explosion');
+    const mainContent = document.getElementById('mainContent');
+    
+    if (!entryOverlay || !entrything || !clickCounter || !explosion || !mainContent) {
+        console.log('Entry elements not found, skipping entry mechanism');
+        return;
+    }
+    
+    entrything.addEventListener('click', (e) => {
+        entrything.style.animation = 'none';
+        entrything.style.transition = 'none';
+        entrything.classList.add('entrything-physics');
+        
+        clickCount++;
+        clickCounter.textContent = `Clicks: ${clickCount}/10`;
+        clickCounter.classList.remove('updated');
+        void clickCounter.offsetWidth;
+        clickCounter.classList.add('updated');
+        
+        const rect = entrything.getBoundingClientRect();
+        const x = rect.left + rect.width / 2;
+        const y = rect.top + rect.height / 2;
+        createParticleBurst(x, y, 15);
+        
+        const pitchMultiplier = 0.8 + (clickCount * 0.2);
+        const audio = new Audio('./static/sploot.ogg');
+        audio.volume = 0.5;
+        audio.preservesPitch = false;
+        audio.playbackRate = Number(pitchMultiplier);
+        audio.play().catch(e => console.log('Audio play error:', e));
+        
+        dx = dy = rotation = 0;
+        scale = 0.7;
+        
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const baseVelocityX = 0.5, baseVelocityY = 0.5, baseRotation = 2, baseScale = 0.02;
+        const velocityMultiplier = 1 + (clickCount - 1) * SPEED_PROGRESSION_FACTOR;
+        
+        vx = ((e.clientX - centerX) / rect.width) * baseVelocityX * velocityMultiplier;
+        vy = ((e.clientY - centerY) / rect.height) * baseVelocityY * velocityMultiplier - 1;
+        vrotation = (Math.random() - 0.5) * baseRotation * velocityMultiplier;
+        vscale = baseScale * velocityMultiplier;
+        
+        animating = true;
+        updatePhysics();
+        
+        if (clickCount >= 10) {
+            entrything.style.transform = 'scale(2) rotate(720deg)';
+            entrything.style.opacity = '0';
+            clickCounter.style.transform = 'scale(2)';
+            clickCounter.style.opacity = '0';
+            
+            explosion.style.display = 'block';
+            const explosionSound = new Audio('./static/explosion.ogg');
+            explosionSound.volume = 0.7;
+            explosionSound.play();
+            
+            entryOverlay.classList.add('dissolving');
+            
+            setTimeout(() => {
+                explosion.style.display = 'none';
+                mainContent.style.display = 'block';
+                document.querySelector('.main-content').classList.add('revealed');
+                setTimeout(() => {
+                    document.querySelectorAll('audio').forEach(audio => {
+                        audio.pause();
+                        audio.currentTime = 0;
+                    });
+                    console.clear();
+                    console.log('=== STARTING MUSIC AFTER ENTRY ANIMATION ===');
+                    startBackgroundMusic();
+                }, 1500);
+            }, 1500);
+        }
+    });
+});
+
+// Helper function to update volume icon
+function updateVolumeIcon(volume) {
+    const icon = document.getElementById('volumeIcon');
+    if (!icon) return;
+    
+    if (volume === 0) {
+        icon.textContent = 'ðŸ”‡';
+    } else if (volume < 0.33) {
+        icon.textContent = 'ðŸ”ˆ';
+    } else if (volume < 0.67) {
+        icon.textContent = 'ðŸ”‰';
+    } else {
+        icon.textContent = 'ðŸ”Š';
+    }
+    console.log('Volume icon updated for volume:', volume);
+}
+
+function startBackgroundMusic() {
+    console.log('=== ATTEMPTING TO START MUSIC ===');
+    
+    // Simple approach - create audio element and play it
+    if (bgMusic) {
+        console.log('Stopping existing music');
+        bgMusic.pause();
+        bgMusic = null;
+    }
+    
+    // Create new audio element
+    console.log('Creating new audio element for: ./static/groovy.ogg');
+    bgMusic = new Audio('./static/groovy.ogg');
+    bgMusic.loop = true;
+    bgMusic.volume = 0.5;
+    
+    // Add event listeners to debug loading
+    bgMusic.addEventListener('loadstart', () => console.log('ðŸ”„ Music loading started'));
+    bgMusic.addEventListener('canplay', () => console.log('âœ… Music can play (loaded enough)'));
+    bgMusic.addEventListener('error', (e) => console.log('âŒ Music load error:', e));
+    
+    // Show volume controls immediately
+    const volumeControl = document.getElementById('volumeControl');
+    if (volumeControl) {
+        volumeControl.style.display = 'flex';
+        console.log('Volume control shown');
+    } else {
+        console.log('âŒ Volume control element not found!');
+    }
+    
+    // Set up volume slider
+    const volumeSlider = document.getElementById('volumeSlider');
+    if (volumeSlider) {
+        volumeSlider.value = 50; // Set to 50%
+        
+        // Clear any existing listeners and add new one
+        volumeSlider.oninput = function() {
+            if (bgMusic) {
+                bgMusic.volume = this.value / 100;
+                updateVolumeIcon(bgMusic.volume);
+                console.log('Volume changed to:', bgMusic.volume);
+            }
+        };
+    }
+    
+    // Set up volume icon for mute/unmute
+    const volumeIcon = document.getElementById('volumeIcon');
+    if (volumeIcon) {
+        volumeIcon.onclick = function() {
+            if (bgMusic) {
+                if (bgMusic.volume > 0) {
+                    bgMusic.savedVolume = bgMusic.volume;
+                    bgMusic.volume = 0;
+                    if (volumeSlider) volumeSlider.value = 0;
+                } else {
+                    bgMusic.volume = bgMusic.savedVolume || 0.5;
+                    if (volumeSlider) volumeSlider.value = bgMusic.volume * 100;
+                }
+                updateVolumeIcon(bgMusic.volume);
+                console.log('Volume toggled to:', bgMusic.volume);
+            }
+        };
+    }
+    
+    // Initialize volume icon
+    updateVolumeIcon(0.5);
+    
+    // Play the music
+    console.log('Attempting to play music...');
+    bgMusic.play().then(() => {
+        console.log('âœ… MUSIC PLAYING SUCCESSFULLY!');
+    }).catch((error) => {
+        console.log('âŒ Music play failed, will try on user interaction:', error);
+        
+        // Show a visual notification that user interaction is needed
+        const musicNotification = document.createElement('div');
+        musicNotification.innerHTML = 'ðŸŽµ Click anywhere to start music!';
+        musicNotification.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 110, 0, 0.9);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            z-index: 10000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            animation: pulse 2s infinite;
+            cursor: pointer;
+        `;
+        document.body.appendChild(musicNotification);
+        
+        // Add a one-time click listener to start music
+        const playOnInteraction = () => {
+            bgMusic.play().then(() => {
+                console.log('âœ… MUSIC STARTED AFTER USER INTERACTION!');
+                musicNotification.remove();
+                document.removeEventListener('click', playOnInteraction);
+            }).catch(err => {
+                console.log('âŒ Still failed after interaction:', err);
+                musicNotification.innerHTML = 'âŒ Music failed to load';
+                setTimeout(() => musicNotification.remove(), 3000);
+            });
+        };
+        
+        // Click anywhere on the page to start music
+        document.addEventListener('click', playOnInteraction);
+        
+        // Also make the notification itself clickable
+        musicNotification.addEventListener('click', playOnInteraction);
+    });
+}
+
+// Fanart gallery
+let currentSlide = 0, slides = [];
+const fanartSlideshow = document.getElementById('fanart-slideshow');
+const prevButton = document.getElementById('prev-fanart');
+const nextButton = document.getElementById('next-fanart');
+const artistNameElement = document.querySelector('.artist-name');
+
+const excitementPhrases = ["WOW AMAZING!", "SO COOL!", "I LOVE THIS!", "INCREDIBLE!", "AWESOME ART!", "FANTASTIC!", "LOOK AT THIS!", "BEAUTIFUL!", "TALENTED ARTIST!", "THIS IS GREAT!"];
+
+function loadFanArt() {
+    const fanartFiles = [
+        { file: "Anchu Bastian.png", artist: "Anchu Bastian" }, { file: "AngelSpeaksSpanish 2.png", artist: "AngelSpeaksSpanish" },
+        { file: "AngelSpeaksSpanish.jpg", artist: "AngelSpeaksSpanish" }, { file: "Cheri Catherine.png", artist: "Cheri Catherine" },
+        { file: "Commission.jpg", artist: "Commission" }, { file: "Deth Ender.jpg", artist: "Deth Ender" },
+        { file: "Dimka.png", artist: "Dimka" }, { file: "DustTheDumbass.png", artist: "DustTheDumbass" },
+        { file: "EEF1234 2.png", artist: "EEF1234" }, { file: "EEF1234.png", artist: "EEF1234" },
+        { file: "Fritz.png", artist: "Fritz" }, { file: "Molly-Mae.png", artist: "Molly-Mae" },
+        { file: "MrMLG.png", artist: "MrMLG" }, { file: "Mystic.jpg", artist: "Mystic" },
+        { file: "NoProblamo.png", artist: "NoProblamo" }, { file: "Theweirdguy69.png", artist: "Theweirdguy69" }
+    ];
+    
+    shuffleArray(fanartFiles);
+    
+    fanartFiles.forEach((item, index) => {
+        const slide = document.createElement('div');
+        slide.className = 'fanart-slide';
+        
+        const img = document.createElement('img');
+        img.className = 'fanart-image';
+        img.src = `./static/fanart/${item.file}`;
+        img.alt = `Fan art by ${item.artist}`;
+        img.dataset.artist = item.artist;
+        img.onerror = () => { img.src = './static/bear.png'; img.alt = 'Image failed to load'; };
+        
+        slide.appendChild(img);
+        fanartSlideshow.appendChild(slide);
+        slides.push(slide);
+    });
+    
+    if (slides.length > 0) showSlide(0);
+}
+
+function showSlide(index) {
+    slides.forEach(slide => slide.classList.remove('active'));
+    
+    if (index >= slides.length) currentSlide = 0;
+    else if (index < 0) currentSlide = slides.length - 1;
+    else currentSlide = index;
+    
+    if (slides[currentSlide]) {
+        slides[currentSlide].classList.add('active');
+        const img = slides[currentSlide].querySelector('img');
+        if (img && img.dataset.artist) {
+            artistNameElement.textContent = "Artist: " + img.dataset.artist;
+            showExcitementText();
+        }
+    }
+}
+
+function showExcitementText() {
+    const excitementText = document.createElement('div');
+    excitementText.className = 'excitement-text rainbow-text';
+    excitementText.textContent = excitementPhrases[Math.floor(Math.random() * excitementPhrases.length)];
+    
+    const container = document.querySelector('.fanart-container');
+    const rect = container.getBoundingClientRect();
+    
+    excitementText.style.left = `${rect.left + Math.random() * rect.width}px`;
+    excitementText.style.top = `${rect.top + Math.random() * rect.height}px`;
+    
+    document.body.appendChild(excitementText);
+    
+    excitementText.style.animation = Math.random() > 0.5 ? 'slide-right 2s forwards' : 'slide-left 2s forwards';
+    setTimeout(() => excitementText.remove(), 2000);
+}
+
+prevButton.addEventListener('click', () => {
+    showSlide(currentSlide - 1);
+    createParticleBurst(prevButton.getBoundingClientRect().left, prevButton.getBoundingClientRect().top);
+    prevButton.classList.add('spin');
+    setTimeout(() => prevButton.classList.remove('spin'), 500);
+});
+
+nextButton.addEventListener('click', () => {
+    showSlide(currentSlide + 1);
+    createParticleBurst(nextButton.getBoundingClientRect().left, nextButton.getBoundingClientRect().top);
+    nextButton.classList.add('spin');
+    setTimeout(() => nextButton.classList.remove('spin'), 500);
+});
+
+// Horse functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const horse = document.querySelector(".horse");
+    if (horse) {
+        horse.addEventListener("click", (event) => {
+            const audio = new Audio('./static/sploot.ogg');
+            audio.volume = 0.5;
+            audio.play();
+            createParticleBurst(event.clientX, event.clientY, 10);
+            createHorseClone();
+        });
+    }
+});
+
+function createHorseClone() {
+    const horse = document.createElement("div");
+    horse.className = "horse";
+    horse.style.left = Math.random() * (window.innerWidth - 100) + "px";
+    horse.style.bottom = Math.random() * (window.innerHeight - 100) + "px";
+    horse.style.transform = `scale(${0.8 + Math.random() * 0.4}) rotate(${Math.random() * 20 - 10}deg)`;
+    horse.style.filter = `hue-rotate(${Math.random() * 360}deg) drop-shadow(4px 4px 10px rgba(0, 0, 0, 0.4))`;
+    horse.style.animation = `bobbing ${2 + Math.random() * 2}s ease-in-out infinite ${Math.random()}s`;
+    
+    document.body.appendChild(horse);
+    
+    horse.addEventListener("click", (event) => {
+        const audio = new Audio('./static/sploot.ogg');
+        audio.volume = 0.5;
+        audio.play();
+        createParticleBurst(event.clientX, event.clientY, 10);
+        horse.style.transform = "scale(0) rotate(720deg)";
+        horse.style.opacity = "0";
+        setTimeout(() => horse.remove(), 500);
+    });
+    
+    return horse;
+}
+
+// Utility functions
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+function createParticleBurst(x, y, count = 20) {
+    const actualCount = Math.min(count, 15);
+    
+    for (let i = 0; i < actualCount; i++) {
+        const particle = document.createElement("div");
+        particle.style.cssText = `position: fixed; width: ${Math.random() * 8 + 3}px; height: ${particle.style.width}; background-color: hsl(${Math.random() * 60 + 20}, 100%, 50%); border-radius: 50%; pointer-events: none; left: ${x}px; top: ${y}px; z-index: 2000;`;
+        
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 80 + 40;
+        const vx = Math.cos(angle) * speed;
+        const vy = Math.sin(angle) * speed;
+        
+        document.body.appendChild(particle);
+        
+        let opacity = 1, scale = 1;
+        
+        function animateParticle() {
+            if (opacity <= 0) { particle.remove(); return; }
+            
+            const currentLeft = parseFloat(particle.style.left);
+            const currentTop = parseFloat(particle.style.top);
+            
+            particle.style.left = (currentLeft + vx) + 'px';
+            particle.style.top = (currentTop + vy) + 'px';
+            
+            opacity -= 0.02; scale += 0.02;
+            particle.style.opacity = opacity;
+            particle.style.transform = `scale(${scale})`;
+            
+            requestAnimationFrame(animateParticle);
+        }
+        
+        requestAnimationFrame(animateParticle);
+    }
+}
+
+// Initialize everything
+window.addEventListener('load', () => {
+    loadFanArt();
+    addMinimizeButtons();
+    setInterval(() => showSlide(currentSlide + 1), 6000);
+});
+
+function addMinimizeButtons() {
+    // Add minimize functionality for fanart and bear counter
+    const fanartContainer = document.querySelector('.fanart-container');
+    if (fanartContainer) {
+        const fanartMinimizeBtn = document.createElement('button');
+        fanartMinimizeBtn.className = 'minimize-btn';
+        fanartMinimizeBtn.textContent = '-';
+        
+        const fanartMaximizeBtn = document.createElement('button');
+        fanartMaximizeBtn.className = 'maximize-btn';
+        fanartMaximizeBtn.textContent = '+';
+        fanartMaximizeBtn.style.cssText = 'left: 50px; top: 50%; transform: translateY(-50%); display: none;';
+        document.body.appendChild(fanartMaximizeBtn);
+        
+        fanartMinimizeBtn.addEventListener('click', () => {
+            fanartContainer.classList.add('minimized');
+            fanartMaximizeBtn.style.display = 'flex';
+        });
+        
+        fanartMaximizeBtn.addEventListener('click', () => {
+            fanartContainer.classList.remove('minimized');
+            fanartMaximizeBtn.style.display = 'none';
+        });
+        
+        fanartContainer.appendChild(fanartMinimizeBtn);
+    }
+    
+    const bearCounter = document.querySelector('.bear-counter');
+    if (bearCounter) {
+        const counterMinimizeBtn = document.createElement('button');
+        counterMinimizeBtn.className = 'minimize-btn';
+        counterMinimizeBtn.textContent = '-';
+        
+        const counterMaximizeBtn = document.createElement('button');
+        counterMaximizeBtn.className = 'maximize-btn';
+        counterMaximizeBtn.textContent = '+';
+        counterMaximizeBtn.style.cssText = 'right: 50px; top: 50%; transform: translateY(-50%); display: none;';
+        document.body.appendChild(counterMaximizeBtn);
+        
+        counterMinimizeBtn.addEventListener('click', () => {
+            bearCounter.classList.add('minimized');
+            counterMaximizeBtn.style.display = 'flex';
+        });
+        
+        counterMaximizeBtn.addEventListener('click', () => {
+            bearCounter.classList.remove('minimized');
+            counterMaximizeBtn.style.display = 'none';
+        });
+        
+        bearCounter.appendChild(counterMinimizeBtn);
+    }
+}
+
+// Start spawning bears
+spawnTimer = setInterval(createFallingBear, currentSpawnInterval);
+
+// Review system placeholder (simplified)
+document.addEventListener('DOMContentLoaded', function() {
+    const reviewButton = document.getElementById('reviewButton');
+    const reviewModal = document.getElementById('reviewModal');
+    const closeModal = document.querySelector('.close-modal');
+    
+    if (reviewButton) {
+        reviewButton.addEventListener('click', () => {
+            reviewModal.style.display = 'flex';
+        });
+    }
+    
+    if (closeModal) {
+        closeModal.addEventListener('click', () => {
+            reviewModal.style.display = 'none';
+        });
+    }
+    
+    reviewModal.addEventListener('click', (e) => {
+        if (e.target === reviewModal) {
+            reviewModal.style.display = 'none';
+        }
+    });
+});
+
+// Physics function for entrything animation
+function updatePhysics() {
+    if (!animating) return;
+    
+    vx += (-dx * springFactor);
+    vy += (-dy * springFactor + gravity);
+    vrotation += (-rotation * rotationSpring);
+    vscale += ((1 - scale) * scaleSpring);
+    
+    dx = dx * friction + vx;
+    dy = dy * friction + vy;
+    rotation = rotation * friction + vrotation;
+    scale = scale * friction + vscale;
+    
+    rotation = Math.max(-45, Math.min(45, rotation));
+    scale = Math.max(0.5, Math.min(1.5, scale));
+    
+    const entrything = document.getElementById('entrything');
+    if (entrything) {
+        entrything.style.cssText = `transform: translate(${dx}px, ${dy}px) rotate(${rotation}deg) scale(${scale}); transition: none !important; animation: none !important;`;
+    }
+    
+    vx *= 0.92; vy *= 0.92; vrotation *= 0.92; vscale *= 0.92;
+    
+    if (Math.abs(vx) < 0.1 && Math.abs(vy) < 0.1 && Math.abs(vrotation) < 0.1 && Math.abs(vscale) < 0.01 && 
+        Math.abs(dx) < 1 && Math.abs(dy) < 1 && Math.abs(rotation) < 1 && Math.abs(scale - 1) < 0.01) {
+        animating = false;
+        if (entrything) {
+            entrything.classList.remove('entrything-physics');
+            entrything.style.cssText = '';
+            entrything.style.animation = 'wobble 2s infinite ease-in-out';
+        }
+    } else {
+        requestAnimationFrame(updatePhysics);
+    }
+} 
             "density": {
                 "enable": true,
                 "value_area": 800
